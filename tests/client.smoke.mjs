@@ -192,11 +192,19 @@ function collect(node, tag, found = []) {
 }
 const allButtons = collect(tree, 'button')
 const switches = allButtons.filter((button) => button.props.role === 'switch')
-const buttons = allButtons.filter((button) => button.props.role !== 'switch')
+const radios = allButtons.filter((button) => button.props.role === 'radio')
+const buttons = allButtons.filter((button) => button.props.role === undefined)
+if (radios.length !== 2) throw new Error(`expected two unfocused strategies, found ${radios.length}`)
 if (buttons.length !== 4) throw new Error(`expected four material buttons, found ${buttons.length}`)
 if (switches.length !== 1) throw new Error(`expected one focus switch, found ${switches.length}`)
 const ranges = collect(tree, 'input')
 if (ranges.length !== 1) throw new Error(`expected one opacity slider, found ${ranges.length}`)
+
+// The second strategy posts `unfocused: "clear"`.
+radios[1].props.onClick()
+await new Promise((resolve) => setTimeout(resolve, 320))
+const strategyPost = requests.find((request) => request.init.method === 'POST' && JSON.parse(request.init.body).unfocused === 'clear')
+if (strategyPost === undefined) throw new Error('unfocused strategy did not reach the Host')
 
 // The focus switch flips keepTransparent and posts the new value.
 switches[0].props.onClick()

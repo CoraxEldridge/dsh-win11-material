@@ -96,17 +96,22 @@ const materialOnly = await call('POST', { material: 'mica' })
 if (materialOnly.body.material !== 'mica') throw new Error('material-only patch did not apply the material')
 if (Math.abs(materialOnly.body.tint - 0.66) > 1e-9) throw new Error(`material-only patch reset the tint to ${materialOnly.body.tint}`)
 
-// With the window unfocused, the accent blur stands in for the DWM backdrop.
+// While unfocused the window drops the DWM backdrop (strategy decides how).
 await new Promise((resolve) => setTimeout(resolve, 600))
 const focusState = await call('POST', { material: 'acrylic', keepTransparent: true })
 if (typeof focusState.body.focused !== 'boolean') throw new Error('focus state missing from the snapshot')
-const expected = focusState.body.focused ? 'acrylic' : 'blur'
+const expected = focusState.body.focused ? 'acrylic' : focusState.body.unfocused
 if (focusState.body.applied !== expected) {
   throw new Error(`applied material should be ${expected} (focused=${focusState.body.focused}), got ${focusState.body.applied}`)
 }
 
 // keepTransparent defaults to true, survives unrelated patches, and can be turned off.
 if (initial.body.keepTransparent !== true) throw new Error('keepTransparent should default to true')
+if (initial.body.unfocused !== 'clear') throw new Error('unfocused should default to clear')
+const clearStrategy = await call('POST', { unfocused: 'clear' })
+if (clearStrategy.body.unfocused !== 'clear') throw new Error('unfocused strategy was not updated')
+if (clearStrategy.body.keepTransparent !== true) throw new Error('strategy patch reset keepTransparent')
+await call('POST', { unfocused: 'blur' })
 const focusOff = await call('POST', { keepTransparent: false })
 if (focusOff.body.keepTransparent !== false) throw new Error('keepTransparent was not updated')
 if (focusOff.body.material !== 'acrylic') throw new Error('keepTransparent patch reset the material')
