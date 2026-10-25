@@ -190,10 +190,20 @@ function collect(node, tag, found = []) {
   for (const child of node.children ?? []) collect(child, tag, found)
   return found
 }
-const buttons = collect(tree, 'button')
+const allButtons = collect(tree, 'button')
+const switches = allButtons.filter((button) => button.props.role === 'switch')
+const buttons = allButtons.filter((button) => button.props.role !== 'switch')
 if (buttons.length !== 4) throw new Error(`expected four material buttons, found ${buttons.length}`)
+if (switches.length !== 1) throw new Error(`expected one focus switch, found ${switches.length}`)
 const ranges = collect(tree, 'input')
 if (ranges.length !== 1) throw new Error(`expected one opacity slider, found ${ranges.length}`)
+
+// The focus switch flips keepTransparent and posts the new value.
+switches[0].props.onClick()
+await new Promise((resolve) => setTimeout(resolve, 320))
+const focusPost = requests.find((request) => request.init.method === 'POST' && JSON.parse(request.init.body).keepTransparent !== undefined)
+if (focusPost === undefined) throw new Error('focus switch did not reach the Host')
+if (JSON.parse(focusPost.init.body).keepTransparent !== false) throw new Error('focus switch posted the wrong value')
 
 // Click "Tabbed": the optimistic preview publishes the attribute immediately.
 const tabbed = buttons.find((button) => button.props.title === 'materials.tabbed')

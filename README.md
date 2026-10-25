@@ -3,6 +3,7 @@
 给 DeepSeek Harness 桌面窗口换上 Windows 11 原生系统材质：**Mica、Acrylic、Tabbed**，页面同时半透明，桌面壁纸会透过窗口显示。
 
 - 材质选择在 **设置 → 窗口材质** 里，切换即时生效（不需要重启）
+- **失焦时保持透明**：Windows 会把失去焦点的 Acrylic/Tabbed 降级成实色，开启这个开关后，窗口不活跃期间自动改用 Mica，重新获得焦点时再切回去（默认开启）
 - 页面不透明度可调，侧栏与页面主体始终同色（跟随主题底色）
 - 输入框底部的状态栏（tok/s、缓存命中、余额）是一条贴合内容的半透明磨砂胶囊
 - 自动适配浅色/深色主题，以及任何第三方主题的配色（捕获主题实际解析出的颜色，而不是写死色值）
@@ -93,7 +94,7 @@ node tools/window-bridge.mjs apply --dry-run
 
 ### 3.3 选材质
 
-**设置 → 窗口材质**：关闭 / Mica / Acrylic / Tabbed，下面一条滑块是整页的不透明度（侧栏与内容区同步）。切换会立即通过 DWM 生效，选择会保存到 `<profile>\win11-material.json`。
+**设置 → 窗口材质**：关闭 / Mica / Acrylic / Tabbed，下面一条滑块是整页的不透明度（侧栏与内容区同步），再下面一个开关控制「失焦时保持透明」。切换会立即通过 DWM 生效，选择会保存到 `<profile>\win11-material.json`。
 
 ---
 
@@ -174,7 +175,8 @@ Host 半部在 Web 服务器上注册 `/win11-material/state`：
 
 - **DSH 更新会覆盖 `app.asar`**，桥接随之失效（插件仍然能加载，只是窗口又变回不透明）。更新后重跑一次 `window-bridge.mjs apply` 即可。
 - 桥接要求 `app.asar` 的主窗口结构没变；结构变化时脚本会直接报错退出，不会写坏已安装文件。
-- **Acrylic 失焦会变实**：这是 Windows 对 Acrylic 的降级行为，Mica 没有这个问题。
+- **Acrylic 失焦会变实**：这是 Windows 对 Acrylic / Tabbed 的降级行为（不活跃窗口改用实色）。插件默认开启「失焦时保持透明」：检测到窗口不是前台窗口时改用 Mica，回到前台再切回所选材质；关掉这个开关就按 Windows 原生行为走。
+- **改了 `lib/native.js` 需要重启 DSH**：Host 热重载只重新求值入口模块，`native.js` 仍在模块缓存里，而且 koffi 的类型名是进程级注册的。
 - 安装目录在 `Program Files` 下时需要管理员权限；`--force` 可以在 DSH 运行时强行打补丁，不推荐。
 - 浅色主题下 Mica 更接近系统观感；Acrylic 在深色主题下更明显。
 
