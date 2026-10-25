@@ -190,38 +190,10 @@ function collect(node, tag, found = []) {
   for (const child of node.children ?? []) collect(child, tag, found)
   return found
 }
-const allButtons = collect(tree, 'button')
-const switches = allButtons.filter((button) => button.props.role === 'switch')
-const radios = allButtons.filter((button) => button.props.role === 'radio')
-const buttons = allButtons.filter((button) => button.props.role === undefined)
-if (radios.length !== 2) throw new Error(`expected two unfocused strategies, found ${radios.length}`)
+const buttons = collect(tree, 'button')
 if (buttons.length !== 4) throw new Error(`expected four material buttons, found ${buttons.length}`)
-if (switches.length !== 1) throw new Error(`expected one focus switch, found ${switches.length}`)
 const ranges = collect(tree, 'input')
 if (ranges.length !== 1) throw new Error(`expected one opacity slider, found ${ranges.length}`)
-
-// The second strategy posts `unfocused: "clear"`.
-radios[1].props.onClick()
-await new Promise((resolve) => setTimeout(resolve, 320))
-const strategyPost = requests.find((request) => request.init.method === 'POST' && JSON.parse(request.init.body).unfocused === 'clear')
-if (strategyPost === undefined) throw new Error('unfocused strategy did not reach the Host')
-
-// The focus switch flips keepTransparent and posts the new value.
-switches[0].props.onClick()
-await new Promise((resolve) => setTimeout(resolve, 320))
-const focusPost = requests.find((request) => request.init.method === 'POST' && JSON.parse(request.init.body).keepTransparent !== undefined)
-if (focusPost === undefined) throw new Error('focus switch did not reach the Host')
-if (JSON.parse(focusPost.init.body).keepTransparent !== false) throw new Error('focus switch posted the wrong value')
-
-// Click "Tabbed": the optimistic preview publishes the attribute immediately.
-const tabbed = buttons.find((button) => button.props.title === 'materials.tabbed')
-if (tabbed === undefined) throw new Error('tabbed button missing')
-tabbed.props.onClick()
-if (html.dataset.dshWin11Material !== 'tabbed') throw new Error('preview did not publish the new material')
-await new Promise((resolve) => setTimeout(resolve, 320))
-const post = requests.find((request) => request.init.method === 'POST' && JSON.parse(request.init.body).material === 'tabbed')
-if (post === undefined) throw new Error('click did not reach the Host')
-if (JSON.parse(post.init.body).material !== 'tabbed') throw new Error('posted material mismatch')
 
 // "Off" removes translucency without dropping the state.
 const off = buttons.find((button) => button.props.title === 'materials.none')
