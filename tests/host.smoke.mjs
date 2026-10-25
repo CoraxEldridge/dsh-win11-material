@@ -96,13 +96,13 @@ const materialOnly = await call('POST', { material: 'mica' })
 if (materialOnly.body.material !== 'mica') throw new Error('material-only patch did not apply the material')
 if (Math.abs(materialOnly.body.tint - 0.66) > 1e-9) throw new Error(`material-only patch reset the tint to ${materialOnly.body.tint}`)
 
-// With the window unfocused, an Acrylic selection must be applied as Mica.
+// With the window unfocused, the accent blur stands in for the DWM backdrop.
 await new Promise((resolve) => setTimeout(resolve, 600))
-const focused = await call('POST', { material: 'acrylic', keepTransparent: true })
-if (typeof focused.body.focused !== 'boolean') throw new Error('focus state missing from the snapshot')
-const expected = focused.body.focused ? 'acrylic' : 'mica'
-if (focused.body.applied !== expected) {
-  throw new Error(`applied material should be ${expected} (focused=${focused.body.focused}), got ${focused.body.applied}`)
+const focusState = await call('POST', { material: 'acrylic', keepTransparent: true })
+if (typeof focusState.body.focused !== 'boolean') throw new Error('focus state missing from the snapshot')
+const expected = focusState.body.focused ? 'acrylic' : 'blur'
+if (focusState.body.applied !== expected) {
+  throw new Error(`applied material should be ${expected} (focused=${focusState.body.focused}), got ${focusState.body.applied}`)
 }
 
 // keepTransparent defaults to true, survives unrelated patches, and can be turned off.
