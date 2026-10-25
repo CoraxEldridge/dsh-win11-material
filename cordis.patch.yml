@@ -1,0 +1,8 @@
+# dsh-win11-material bundle patch.
+#
+# Inserts the window-material plugin into the profile's plugin roster. Install
+# the bundle with:
+#   dsh plugin --profile desktop add <this directory>
+- insert:
+    - id: ui-win11-material
+      name: 'dsh-win11-material'

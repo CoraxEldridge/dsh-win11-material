@@ -1,0 +1,52 @@
+{
+  "name": "dsh-win11-material",
+  "version": "0.1.0",
+  "description": "Windows 11 system window materials (Mica, Acrylic, Tabbed) for the DeepSeek Harness desktop window.",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "tools",
+    "cordis.patch.yml",
+    "README.md"
+  ],
+  "keywords": [
+    "dsh-plugin",
+    "deepseek-harness",
+    "windows-11",
+    "mica",
+    "acrylic"
+  ],
+  "scripts": {
+    "test": "node tests/host.smoke.mjs && node tests/client.smoke.mjs",
+    "profile:install": "node tools/install.mjs",
+    "profile:uninstall": "node tools/uninstall.mjs",
+    "bridge": "node tools/window-bridge.mjs"
+  },
+  "dsh": {
+    "engines": {
+      "dsh": ">=0.2.0-rc.2"
+    },
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "inject": [],
+      "platform": "web"
+    }
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "^4.0.1"
+  },
+  "peerDependenciesMeta": {
+    "@deepseek-ai/cordis": {
+      "optional": true
+    }
+  },
+  "license": "MIT"
+}
