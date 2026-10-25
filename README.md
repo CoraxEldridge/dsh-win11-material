@@ -53,8 +53,16 @@ Windows 10 上插件照常工作，但材质只能选择「关闭」。
 
 ### 3.1 装插件
 
+先取到源码：
+
 ```powershell
-cd <插件目录>
+git clone https://github.com/CoraxEldridge/dsh-win11-material.git
+cd dsh-win11-material
+```
+
+然后把它链进当前 profile：
+
+```powershell
 node tools/install.mjs
 ```
 

@@ -20,7 +20,8 @@
     "deepseek-harness",
     "windows-11",
     "mica",
-    "acrylic"
+    "acrylic",
+    "dwm"
   ],
   "scripts": {
     "test": "node tests/host.smoke.mjs && node tests/client.smoke.mjs",
@@ -48,5 +49,14 @@
       "optional": true
     }
   },
-  "license": "MIT"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CoraxEldridge/dsh-win11-material.git"
+  },
+  "homepage": "https://github.com/CoraxEldridge/dsh-win11-material#readme",
+  "bugs": {
+    "url": "https://github.com/CoraxEldridge/dsh-win11-material/issues"
+  },
+  "author": "桜川夕凪 <Baichuan.Qiao@hotmail.com>"
 }
